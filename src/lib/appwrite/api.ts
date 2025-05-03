@@ -1,7 +1,7 @@
-import { ID } from "appwrite";
+import { ID, Query } from "appwrite";
 
-import { INewUser } from "@/types";
-import { account, avatars } from "./config";
+import { appwriteConfig, account, databases, storage, avatars } from "./config";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 
 export async function createUserAccount(user: INewUser) {
   try {
@@ -37,4 +37,37 @@ export async function saveUserToDB(user: {
   name: string;
   imageUrl: URL;
   username?: string;
-}) {}
+}) {
+  try {
+    const newUser = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      ID.unique(),
+      user
+    );
+
+    return newUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function signInAccount(user: { email: string; password: string }) {
+  try {
+    const session = await account.createEmailSession(user.email, user.password);
+
+    return session;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Get Account
+
+export async function getAccount() {
+  try {
+    const currentAccount = await account.get();
+  } catch (error) {
+    console.log(error);
+  }
+}
